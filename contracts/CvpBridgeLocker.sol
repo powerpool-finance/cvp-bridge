@@ -29,7 +29,7 @@ contract CvpBridgeLocker is Ownable {
   }
 
   /**
-    @title Send CVP Tokens to another blockchain
+    Send CVP Tokens to another blockchain
     @dev Sends CVP tokens to the specified recipient on the specified chain.
     @param _toChainID ID of the destination chain.
     @param _amount Amount of CVP tokens to be sent.
@@ -46,7 +46,7 @@ contract CvpBridgeLocker is Ownable {
   }
 
   /**
-    @title Unlock CVP Tokens received from another blockchain
+    Unlock CVP Tokens received from another blockchain
     @dev Unlocks CVP tokens received from the specified chain and sends them to the specified recipient.
     @param _fromChainID ID of the source chain.
     @param _amount Amount of CVP tokens to be unlocked.
@@ -61,7 +61,7 @@ contract CvpBridgeLocker is Ownable {
   }
 
   /**
-    @title Check chain limits for cross-chain transfers
+    Check chain limits for cross-chain transfers
     @dev Checks if the specified amount of tokens can be transferred to the specified chain based on the daily limit set for the chain.
     @param _chainID ID of the chain being checked for the transfer limit.
     @param _amount Amount of tokens to be transferred.
@@ -74,7 +74,7 @@ contract CvpBridgeLocker is Ownable {
   }
 
   /**
-    @title Check if function is called by a valid cross-chain contract
+    Check if function is called by a valid cross-chain contract
     @dev Checks if the function is being called by a valid cross-chain contract for the specified source chain.
     @param _fromChainID ID of the source chain.
   */
@@ -91,7 +91,7 @@ contract CvpBridgeLocker is Ownable {
   }
 
   /**
-    @title Encode the unlock command for cross-chain transfer
+    Encode the unlock command for cross-chain transfer
     @dev Encodes the unlock command with the specified amount and recipient address for the current chain ID.
     @param _amount Amount of tokens to be unlocked.
     @param _recipient Address of the recipient of the unlocked tokens.
@@ -112,7 +112,7 @@ contract CvpBridgeLocker is Ownable {
   }
 
   /**
-    @title Send the transaction to the specified chain
+    Send the transaction to the specified chain
     @dev Sends the transaction to the specified chain using the deBridgeGate.
     @param _dstTransactionCall The encoded transaction to be sent to the destination chain.
     @param _toChainId The ID of the destination chain.
@@ -165,7 +165,7 @@ contract CvpBridgeLocker is Ownable {
   }
 
   /**
-    @title Allows the owner to set the address of the DeBridgeGate contract.
+    Allows the owner to set the address of the DeBridgeGate contract.
     @param _deBridgeGate Address of the new DeBridgeGate contract.
   */
   function setDeBridgeGate(IDeBridgeGate _deBridgeGate) external onlyOwner {
