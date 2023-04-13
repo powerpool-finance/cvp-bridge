@@ -79,9 +79,9 @@ describe('CvpBridgeLocker', () => {
 
     it('sendToChain', async () => {
       await this.cvp.approve(this.cvpBridgeChain1.address, ether(100), {from: bob});
-      await expectRevert(this.cvpBridgeChain1.sendToChain(2, ether(100), alice, {from: bob}), "Limit reached");
+      await expectRevert(this.cvpBridgeChain1.sendToChain(2, ether(100), alice, 0, {from: bob}), "Limit reached");
       await this.cvpBridgeChain1.setChainLimitPerDay(2, ether(100));
-      await this.cvpBridgeChain1.sendToChain(2, ether(100), alice, {from: bob, value: ether(0.1)});
+      await this.cvpBridgeChain1.sendToChain(2, ether(100), alice, 0, {from: bob, value: ether(0.1)});
 
       assert.equal(await this.cvp.balanceOf(alice), '0');
 
