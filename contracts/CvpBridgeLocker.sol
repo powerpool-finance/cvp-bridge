@@ -34,15 +34,16 @@ contract CvpBridgeLocker is Ownable {
     @param _toChainID ID of the destination chain.
     @param _amount Amount of CVP tokens to be sent.
     @param _recipient Address of the recipient on the destination chain.
+    @param _referralCode An optional referral code to include in the transaction.
   */
-  function sendToChain(uint256 _toChainID, uint256 _amount, address _recipient) external payable {
+  function sendToChain(uint256 _toChainID, uint256 _amount, address _recipient, uint32 _referralCode) external payable {
     require(destinationChainContracts[_toChainID] != address(0), "Chain contract address not specified");
     _checkChainLimits(_toChainID, _amount);
 
     cvp.safeTransferFrom(msg.sender, address(this), _amount);
 
     bytes memory dstTxCall = _encodeUnlockCommand(_amount, _recipient);
-    _send(dstTxCall, _toChainID);
+    _send(dstTxCall, _toChainID, _referralCode);
   }
 
   /**
@@ -116,8 +117,9 @@ contract CvpBridgeLocker is Ownable {
     @dev Sends the transaction to the specified chain using the deBridgeGate.
     @param _dstTransactionCall The encoded transaction to be sent to the destination chain.
     @param _toChainId The ID of the destination chain.
+    @param _referralCode An optional referral code to include in the transaction.
   */
-  function _send(bytes memory _dstTransactionCall, uint256 _toChainId) internal {
+  function _send(bytes memory _dstTransactionCall, uint256 _toChainId, uint32 _referralCode) internal {
     //
     // sanity checks
     //
@@ -159,7 +161,7 @@ contract CvpBridgeLocker is Ownable {
       abi.encodePacked(destinationChainContracts[_toChainId]), // _receiver
       "", // _permit
       true, // _useAssetFee
-      0, // _referralCode
+      _referralCode, // _referralCode
       abi.encode(autoParams) // _autoParams
     );
   }
