@@ -42,7 +42,7 @@ contract CvpBridgeLocker is Ownable {
     cvp.safeTransferFrom(msg.sender, address(this), _amount);
 
     bytes memory dstTxCall = _encodeUnlockCommand(_amount, _recipient);
-    _send(dstTxCall, _toChainID, 0);
+    _send(dstTxCall, _toChainID);
   }
 
   /**
@@ -116,33 +116,25 @@ contract CvpBridgeLocker is Ownable {
     @dev Sends the transaction to the specified chain using the deBridgeGate.
     @param _dstTransactionCall The encoded transaction to be sent to the destination chain.
     @param _toChainId The ID of the destination chain.
-    @param _executionFee The execution fee to be paid to the executor.
   */
-  function _send(bytes memory _dstTransactionCall, uint256 _toChainId, uint256 _executionFee) internal {
+  function _send(bytes memory _dstTransactionCall, uint256 _toChainId) internal {
     //
     // sanity checks
     //
     uint256 protocolFee = deBridgeGate.globalFixedNativeFee();
     require(
-      msg.value >= (protocolFee + _executionFee),
+      msg.value >= protocolFee,
       "fees not covered by the msg.value"
     );
 
-    // we bridge as much asset as specified in the _executionFee arg
-    // (i.e. bridging the minimum necessary amount to to cover the cost of execution)
-    // However, deBridge cuts a small fee off the bridged asset, so
-    // we must ensure that executionFee < amountToBridge
     uint assetFeeBps = deBridgeGate.globalTransferFeeBps();
-    uint amountToBridge = _executionFee;
-    uint amountAfterBridge = amountToBridge * (10000 - assetFeeBps) / 10000;
-
+    uint amountToBridge = 0;
     //
     // start configuring a message
     //
     IDeBridgeGate.SubmissionAutoParamsTo memory autoParams;
 
-    // use the whole amountAfterBridge as the execution fee to be paid to the executor
-    autoParams.executionFee = amountAfterBridge;
+    autoParams.executionFee = 0;
 
     autoParams.flags = Flags.setFlag(
       autoParams.flags,
