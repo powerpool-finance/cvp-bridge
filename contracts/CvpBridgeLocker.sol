@@ -125,7 +125,7 @@ contract CvpBridgeLocker is Ownable {
     //
     uint256 protocolFee = deBridgeGate.globalFixedNativeFee();
     require(
-      msg.value >= protocolFee,
+      msg.value == protocolFee,
       "fees not covered by the msg.value"
     );
 
