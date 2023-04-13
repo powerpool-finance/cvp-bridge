@@ -22,7 +22,7 @@ contract CvpBridgeLocker is Ownable {
   mapping(uint256 => uint256) public chainLimitPerDay;
   mapping(uint256 => mapping(uint256 => uint256)) public transfersPerDay;
 
-  constructor(IDeBridgeGate _deBridgeGate, IERC20 _cvp, uint256 _currentChainId) public Ownable() {
+  constructor(IDeBridgeGate _deBridgeGate, IERC20 _cvp, uint256 _currentChainId) Ownable() {
     deBridgeGate = _deBridgeGate;
     cvp = _cvp;
     currentChainId = _currentChainId;
