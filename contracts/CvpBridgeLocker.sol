@@ -144,8 +144,6 @@ contract CvpBridgeLocker is Ownable {
     // use the whole amountAfterBridge as the execution fee to be paid to the executor
     autoParams.executionFee = amountAfterBridge;
 
-    // Exposing nativeSender must be requested explicitly
-    // We request it bc of CrossChainCounter's onlyCrossChainIncrementor modifier
     autoParams.flags = Flags.setFlag(
       autoParams.flags,
       Flags.PROXY_WITH_SENDER,
