@@ -67,7 +67,7 @@ contract CvpBridgeLocker is Ownable {
     @param _amount Amount of tokens to be transferred.
   */
   function _checkChainLimits(uint256 _chainID, uint256 _amount) internal {
-    uint256 curEpoch = block.timestamp / 7 days;
+    uint256 curEpoch = block.timestamp / 1 days;
     transfersPerDay[_chainID][curEpoch] += _amount;
 
     require(chainLimitPerDay[_chainID] >= transfersPerDay[_chainID][curEpoch], "Limit reached");
