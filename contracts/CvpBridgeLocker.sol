@@ -128,9 +128,6 @@ contract CvpBridgeLocker is Ownable {
       msg.value == protocolFee,
       "fees not covered by the msg.value"
     );
-
-    uint assetFeeBps = deBridgeGate.globalTransferFeeBps();
-    uint amountToBridge = 0;
     //
     // start configuring a message
     //
@@ -156,11 +153,11 @@ contract CvpBridgeLocker is Ownable {
 
     deBridgeGate.send{value : msg.value}(
       address(0), // _tokenAddress
-      amountToBridge, // _amount
+      0, // _amount
       _toChainId, // _chainIdTo
       abi.encodePacked(destinationChainContracts[_toChainId]), // _receiver
       "", // _permit
-      true, // _useAssetFee
+      false, // _useAssetFee
       _referralCode, // _referralCode
       abi.encode(autoParams) // _autoParams
     );
