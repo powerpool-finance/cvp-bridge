@@ -3,6 +3,7 @@ require('@nomiclabs/hardhat-etherscan');
 require('solidity-coverage');
 require('hardhat-contract-sizer');
 require('hardhat-gas-reporter');
+require('./tasks/deployCvpBridgeLocker');
 
 const fs = require('fs');
 const homeDir = require('os').homedir();
@@ -57,7 +58,14 @@ const config = {
     mainnet: {
       url: 'https://mainnet-eth.compound.finance',
       accounts: getAccounts('mainnet'),
-      gasPrice: 100 * 10 ** 9,
+      gasPrice: 45 * 10 ** 9,
+      gasMultiplier: 1.2,
+      timeout: 2000000,
+    },
+    bnb: {
+      url: 'https://1rpc.io/bnb',
+      accounts: getAccounts('bnb'),
+      gasPrice: 5 * 10 ** 9,
       gasMultiplier: 1.2,
       timeout: 2000000,
     },
