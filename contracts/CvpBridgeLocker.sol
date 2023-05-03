@@ -11,6 +11,7 @@ import "./interfaces/ICallProxy.sol";
 
 contract CvpBridgeLocker is Ownable {
   using SafeERC20 for IERC20;
+  using Flags for uint256;
 
   IDeBridgeGate public deBridgeGate;
   IERC20 public immutable cvp;
@@ -21,6 +22,9 @@ contract CvpBridgeLocker is Ownable {
 
   mapping(uint256 => uint256) public chainLimitPerDay;
   mapping(uint256 => mapping(uint256 => uint256)) public transfersPerDay;
+
+  event SendToChain(address sender, uint256 amount, uint256 toChainID, address indexed receipient, uint32 indexed referralCode, bytes32 indexed submissionId);
+  event Unlock(address indexed sender, uint256 amount, uint256 indexed fromChainID, address indexed receipient);
 
   constructor(IDeBridgeGate _deBridgeGate, IERC20 _cvp, uint256 _currentChainId) Ownable() {
     deBridgeGate = _deBridgeGate;
@@ -43,7 +47,8 @@ contract CvpBridgeLocker is Ownable {
     cvp.safeTransferFrom(msg.sender, address(this), _amount);
 
     bytes memory dstTxCall = _encodeUnlockCommand(_amount, _recipient);
-    _send(dstTxCall, _toChainID, _referralCode);
+    bytes32 submissionId = _send(dstTxCall, _toChainID, _referralCode);
+    emit SendToChain(msg.sender, _amount, _toChainID, _recipient, _referralCode, submissionId);
   }
 
   /**
@@ -59,6 +64,7 @@ contract CvpBridgeLocker is Ownable {
     _checkChainLimits(_fromChainID, _amount);
 
     cvp.safeTransfer(_recipient, _amount);
+    emit Unlock(msg.sender, _amount, _fromChainID, _recipient);
   }
 
   /**
@@ -119,47 +125,17 @@ contract CvpBridgeLocker is Ownable {
     @param _toChainId The ID of the destination chain.
     @param _referralCode An optional referral code to include in the transaction.
   */
-  function _send(bytes memory _dstTransactionCall, uint256 _toChainId, uint32 _referralCode) internal {
-    //
-    // sanity checks
-    //
-    uint256 protocolFee = deBridgeGate.globalFixedNativeFee();
-    require(
-      msg.value == protocolFee,
-      "fees not covered by the msg.value"
-    );
-    //
-    // start configuring a message
-    //
-    IDeBridgeGate.SubmissionAutoParamsTo memory autoParams;
+  function _send(bytes memory _dstTransactionCall, uint256 _toChainId, uint32 _referralCode) internal returns(bytes32 submissionId) {
+    uint flags = uint(0)
+      .setFlag(Flags.REVERT_IF_EXTERNAL_FAIL, true)
+      .setFlag(Flags.PROXY_WITH_SENDER, true);
 
-    autoParams.executionFee = 0;
-
-    autoParams.flags = Flags.setFlag(
-      autoParams.flags,
-      Flags.PROXY_WITH_SENDER,
-      true
-    );
-
-    // if something happens, we need to revert the transaction, otherwise the sender will loose assets
-    autoParams.flags = Flags.setFlag(
-      autoParams.flags,
-      Flags.REVERT_IF_EXTERNAL_FAIL,
-      true
-    );
-
-    autoParams.data = _dstTransactionCall;
-    autoParams.fallbackAddress = abi.encodePacked(msg.sender);
-
-    deBridgeGate.send{value : msg.value}(
-      address(0), // _tokenAddress
-      0, // _amount
+    return deBridgeGate.sendMessage{value : msg.value}(
       _toChainId, // _chainIdTo
-      abi.encodePacked(destinationChainContracts[_toChainId]), // _receiver
-      "", // _permit
-      false, // _useAssetFee
-      _referralCode, // _referralCode
-      abi.encode(autoParams) // _autoParams
+      abi.encodePacked(destinationChainContracts[_toChainId]), // _targetContractAddress
+      _dstTransactionCall, // _targetContractCalldata
+      flags, // _flags
+      _referralCode // _referralCode
     );
   }
 
