@@ -11,22 +11,19 @@ task('deploy-cvp-bridge-locker', 'Deploy CVP Bridge Locker')
     const sendOptions = {from: deployer};
 
     const deBridgeAddress = '0x43dE2d77BF8027e25dBD179B491e8d64f38398aA';
-    const {cvpAddress, chainId} = ({
+    const {cvpAddress} = ({
       bnb: {
         cvpAddress: '0x5ec3adbdae549dce842e24480eb2434769e22b2e',
-        chainId: 56
       },
       mainnet: {
         cvpAddress: '0x38e4adb44ef08f22f5b5b76a8f0c2d0dcbe7dca1',
-        chainId: 1
       }
     })[network.name];
 
     console.log('network', network.name);
     console.log('cvpAddress', cvpAddress);
-    console.log('chainId', chainId);
 
-    const cvpBridge = await CvpBridgeLocker.new(deBridgeAddress, cvpAddress, chainId, sendOptions);
+    const cvpBridge = await CvpBridgeLocker.new(deBridgeAddress, cvpAddress, sendOptions);
     console.log('cvpBridge.address', cvpBridge.address);
   });
 
@@ -41,22 +38,24 @@ task('deploy-mock-bridge-locker', 'Deploy Mock Bridge Locker')
     const sendOptions = {from: deployer};
 
     const deBridgeAddress = '0x43dE2d77BF8027e25dBD179B491e8d64f38398aA';
-    const {chainId} = ({
+    let {erc20MockAddress} = ({
       bnb: {
-        chainId: 56
+        erc20MockAddress: '0xff7a036eb201a611069a9de689d245d13d3c626e'
       },
       mainnet: {
-        chainId: 1
+        erc20MockAddress: '0x902f7d304CCf03e83Deb279673B9B458Ec0A3B7e'
       }
     })[network.name];
 
     console.log('network', network.name);
-    console.log('chainId', chainId);
 
-    const erc20Mock = await Erc20Mock.new(sendOptions);
-    console.log('erc20Mock', erc20Mock.address);
+    if (!erc20MockAddress) {
+      const erc20Mock = await Erc20Mock.new(sendOptions);
+      console.log('erc20Mock', erc20Mock.address);
+      erc20MockAddress = erc20Mock.address;
+    }
 
-    const cvpBridge = await CvpBridgeLocker.new(deBridgeAddress, erc20Mock.address, chainId, sendOptions);
+    const cvpBridge = await CvpBridgeLocker.new(deBridgeAddress, erc20MockAddress, sendOptions);
     console.log('cvpBridge.address', cvpBridge.address);
   });
 

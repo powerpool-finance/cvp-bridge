@@ -15,7 +15,6 @@ contract CvpBridgeLocker is Ownable {
 
   IDeBridgeGate public deBridgeGate;
   IERC20 public immutable cvp;
-  uint256 public immutable currentChainId;
 
   mapping(uint256 => address) public destinationChainContracts;
   mapping(uint256 => address) public sourceChainsContracts;
@@ -26,10 +25,19 @@ contract CvpBridgeLocker is Ownable {
   event SendToChain(address sender, uint256 amount, uint256 toChainID, address indexed receipient, uint32 indexed referralCode, bytes32 indexed submissionId);
   event Unlock(address indexed sender, uint256 amount, uint256 indexed fromChainID, address indexed receipient);
 
-  constructor(IDeBridgeGate _deBridgeGate, IERC20 _cvp, uint256 _currentChainId) Ownable() {
+  constructor(IDeBridgeGate _deBridgeGate, IERC20 _cvp) Ownable() {
     deBridgeGate = _deBridgeGate;
     cvp = _cvp;
-    currentChainId = _currentChainId;
+  }
+
+  /**
+    Returns the current chain ID, as an integer.
+    @return cid uint256 representing the current chain ID.
+  */
+  function getChainId() public virtual view returns (uint256 cid) {
+    assembly {
+      cid := chainid()
+    }
   }
 
   /**
@@ -112,7 +120,7 @@ contract CvpBridgeLocker is Ownable {
     return
     abi.encodeWithSelector(
       CvpBridgeLocker.unlock.selector,
-      currentChainId,
+      getChainId(),
       _amount,
       _recipient
     );
