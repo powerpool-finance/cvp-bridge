@@ -1,5 +1,5 @@
 require('@nomiclabs/hardhat-truffle5');
-require('@nomiclabs/hardhat-etherscan');
+require('@nomicfoundation/hardhat-verify');
 require('solidity-coverage');
 require('hardhat-contract-sizer');
 require('hardhat-gas-reporter');
@@ -57,17 +57,34 @@ const config = {
       hardfork: 'muirGlacier',
     },
     mainnet: {
-      url: 'https://mainnet-eth.compound.finance',
+      url: 'https://eth.llamarpc.com',
       accounts: getAccounts('mainnet'),
-      gasPrice: 83 * 10 ** 9,
+      gasPrice: 16 * 10 ** 9,
       gasMultiplier: 1.2,
       timeout: 2000000,
+    },
+    gnosis: {
+      // url: 'https://rpc.gnosischain.com',
+      url: 'https://gnosis.publicnode.com',
+      accounts: getAccounts('mainnet'),
+      timeout: 2000000,
+      maxPriorityFeePerGas: 1e9,
     },
     bnb: {
       url: 'https://1rpc.io/bnb',
       accounts: getAccounts('bnb'),
       gasPrice: 5 * 10 ** 9,
       gasMultiplier: 1.2,
+      timeout: 2000000,
+    },
+    arbitrumOne: {
+      url: 'https://arb-mainnet.g.alchemy.com/v2/tQFmS38OvgHiqYEqyeheRkyGPGdkBsAc',
+      accounts: getAccounts('mainnet'),
+      timeout: 2000000,
+    },
+    base: {
+      url: 'https://base.meowrpc.com',
+      accounts: getAccounts('mainnet'),
       timeout: 2000000,
     },
     alchemy: {
@@ -120,7 +137,34 @@ const config = {
     target: 'ethers-v5',
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_KEY
+    apiKey: {
+      sepolia: 'INAGAAXXXE2GCP41VCSGFXH6V1XB3ET1JH',
+      gnosis: 'C3T8FPADMAIJU7JY79R1HJM2NQVV1W4GDY',
+      xdai: 'C3T8FPADMAIJU7JY79R1HJM2NQVV1W4GDY',
+      mainnet: 'GZZTYX65FNXUPIZVABYWY76FDPDHAF3GAA',
+      goerli: 'GZZTYX65FNXUPIZVABYWY76FDPDHAF3GAA',
+      arbitrumOne: 'NJJGJQW63YE1435MHVVCIZPDUKRNKDC1AC',
+      polygon: '9KFX8DRQRVC22RMC6N3FFCTQ244NS1Y4QZ',
+      base: 'E1K37MI7KAXFGS6K2NBV94PD95XQWNH5M6'
+    },
+    customChains: [
+      {
+        network: 'linea',
+        chainId: 59144,
+        urls: {
+          apiURL: 'https://api.lineascan.build',
+          browserURL: 'https://lineascan.build'
+        }
+      },
+      // {
+      //   network: 'base',
+      //   chainId: 8453,
+      //   urls: {
+      //     apiURL: 'https://api.basescan.org',
+      //     browserURL: 'https://basescan.org'
+      //   }
+      // }
+    ]
   }
 };
 

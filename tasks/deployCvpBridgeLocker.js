@@ -40,10 +40,19 @@ task('deploy-mock-bridge-locker', 'Deploy Mock Bridge Locker')
     const deBridgeAddress = '0x43dE2d77BF8027e25dBD179B491e8d64f38398aA';
     let {erc20MockAddress} = ({
       bnb: {
-        erc20MockAddress: '0xff7a036eb201a611069a9de689d245d13d3c626e'
+        // erc20MockAddress: '0xff7a036eb201a611069a9de689d245d13d3c626e'
       },
       mainnet: {
-        erc20MockAddress: '0x902f7d304CCf03e83Deb279673B9B458Ec0A3B7e'
+        // erc20MockAddress: '0x902f7d304CCf03e83Deb279673B9B458Ec0A3B7e'
+      },
+      arbitrumOne: {
+        // erc20MockAddress: '0x902f7d304CCf03e83Deb279673B9B458Ec0A3B7e'
+      },
+      gnosis: {
+
+      },
+      base: {
+
       }
     })[network.name];
 
