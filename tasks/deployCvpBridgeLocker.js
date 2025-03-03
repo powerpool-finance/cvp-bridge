@@ -37,7 +37,7 @@ task('deploy-cvp-bridge-locker', 'Deploy CVP Bridge Locker')
     const sendOptions = {from: deployer};
 
     const deBridgeAddress = '0x43dE2d77BF8027e25dBD179B491e8d64f38398aA';
-    const {cvpAddress} = ({
+    const {cvpAddress, internalChainId} = ({
       bnb: {
         cvpAddress: '0x5ec3adbdae549dce842e24480eb2434769e22b2e',
       },
@@ -46,13 +46,26 @@ task('deploy-cvp-bridge-locker', 'Deploy CVP Bridge Locker')
       },
       base: {
         cvpAddress: '0x11b8C0BC88BEeFa5773e32931C4897EC6B44f220',
+      },
+      arbitrumOne: {
+        cvpAddress: '0xeA20D1D24bD9aE0E4AD3982F302d8441CA5e5b99',
+      },
+      linea: {
+        cvpAddress: '0x7CA57d72D07bf333a3A50e68a2CC36aeDcfD89cF',
+      },
+      gnosis: {
+        cvpAddress: '0x38e4adB44ef08F22F5B5b76A8f0c2d0dCbE7DcA1',
+        internalChainId: 100000002,
+      },
+      polygon: {
+        cvpAddress: '0x00a7E9a2AD5F7b949C2Bfdfd396514C1BaF1B217',
       }
     })[network.name];
 
     console.log('network', network.name);
     console.log('cvpAddress', cvpAddress);
 
-    const cvpBridge = await CvpBridgeLocker.new(deBridgeAddress, cvpAddress, sendOptions);
+    const cvpBridge = await CvpBridgeLocker.new(deBridgeAddress, cvpAddress, internalChainId || '0', sendOptions);
     console.log('cvpBridge.address', cvpBridge.address);
   });
 

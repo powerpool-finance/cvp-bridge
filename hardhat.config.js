@@ -5,6 +5,7 @@ require('hardhat-contract-sizer');
 require('hardhat-gas-reporter');
 require('./tasks/deployCvpBridgeLocker');
 require('./tasks/testCvpBridgeLocker');
+require('./tasks/solidity-json');
 
 const fs = require('fs');
 const homeDir = require('os').homedir();
@@ -64,11 +65,17 @@ const config = {
       timeout: 2000000,
     },
     gnosis: {
-      // url: 'https://rpc.gnosischain.com',
       url: 'https://gnosis.publicnode.com',
       accounts: getAccounts('mainnet'),
       timeout: 2000000,
-      maxPriorityFeePerGas: 1e9,
+      // maxPriorityFeePerGas: 1e9,
+    },
+    polygon: {
+      url: 'https://polygon-rpc.com',
+      accounts: getAccounts('mainnet'),
+      timeout: 2000000,
+      gasPrice: 110 * 10 ** 9,
+      // maxPriorityFeePerGas: 1e9,
     },
     bnb: {
       url: 'https://1rpc.io/bnb',
@@ -84,6 +91,11 @@ const config = {
     },
     base: {
       url: 'https://base.meowrpc.com',
+      accounts: getAccounts('mainnet'),
+      timeout: 2000000,
+    },
+    linea: {
+      url: 'https://rpc.linea.build',
       accounts: getAccounts('mainnet'),
       timeout: 2000000,
     },
@@ -145,7 +157,8 @@ const config = {
       goerli: 'GZZTYX65FNXUPIZVABYWY76FDPDHAF3GAA',
       arbitrumOne: 'NJJGJQW63YE1435MHVVCIZPDUKRNKDC1AC',
       polygon: '9KFX8DRQRVC22RMC6N3FFCTQ244NS1Y4QZ',
-      base: 'E1K37MI7KAXFGS6K2NBV94PD95XQWNH5M6'
+      base: 'E1K37MI7KAXFGS6K2NBV94PD95XQWNH5M6',
+      linea: 'A3VS79BG4T9NYQUD47V9EHAV26I8VKJSXN'
     },
     customChains: [
       {

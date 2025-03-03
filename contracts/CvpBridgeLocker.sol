@@ -22,12 +22,15 @@ contract CvpBridgeLocker is Ownable {
   mapping(uint256 => uint256) public chainLimitPerDay;
   mapping(uint256 => mapping(uint256 => uint256)) public transfersPerDay;
 
+  uint256 public internalChainId;
+
   event SendToChain(address sender, uint256 amount, uint256 toChainID, address indexed receipient, uint32 indexed referralCode, bytes32 indexed submissionId);
   event Unlock(address indexed sender, uint256 amount, uint256 indexed fromChainID, address indexed receipient);
 
-  constructor(IDeBridgeGate _deBridgeGate, IERC20 _cvp) Ownable() {
+  constructor(IDeBridgeGate _deBridgeGate, IERC20 _cvp, uint256 _internalChainId) Ownable() {
     deBridgeGate = _deBridgeGate;
     cvp = _cvp;
+    internalChainId = _internalChainId;
   }
 
   /**
@@ -35,6 +38,9 @@ contract CvpBridgeLocker is Ownable {
     @return cid uint256 representing the current chain ID.
   */
   function getChainId() public virtual view returns (uint256 cid) {
+    if (internalChainId != 0) {
+      return internalChainId;
+    }
     assembly {
       cid := chainid()
     }
@@ -153,6 +159,14 @@ contract CvpBridgeLocker is Ownable {
   */
   function setDeBridgeGate(IDeBridgeGate _deBridgeGate) external onlyOwner {
     deBridgeGate = _deBridgeGate;
+  }
+
+  /**
+    Allows the owner to set the internal chain id for the DeBridgeGate contract.
+    @param _internalChainId Internal chain id.
+  */
+  function setInternalChainId(uint256 _internalChainId) external onlyOwner {
+    internalChainId = _internalChainId;
   }
 
   /**

@@ -1,7 +1,7 @@
 const { expectRevert } = require('@openzeppelin/test-helpers');
 const assert = require('chai').assert;
 const CvpMock = artifacts.require('CvpMock');
-const CvpBridgeLocker = artifacts.require('CvpBridgeLockerMock');
+const CvpBridgeLocker = artifacts.require('CvpBridgeLocker');
 const DeBridgeGateMock = artifacts.require('DeBridgeGateMock');
 
 CvpBridgeLocker.numberFormat = 'String';
@@ -38,14 +38,24 @@ describe('CvpBridgeLocker', () => {
     });
 
     it('sendToChain', async () => {
+      assert.equal(await this.cvpBridgeChain1.getChainId(), '1');
+      assert.equal(await this.cvpBridgeChain2.getChainId(), '2');
+
+      await expectRevert(this.cvpBridgeChain1.setInternalChainId(1, {from: bob}), 'Ownable: caller is not the owner');
+
+      await this.cvpBridgeChain1.setInternalChainId(100, {from: minter});
+      assert.equal(await this.cvpBridgeChain1.getChainId(), '100');
+      await this.cvpBridgeChain1.setInternalChainId(1, {from: minter});
+      assert.equal(await this.cvpBridgeChain1.getChainId(), '1');
+
       await this.cvp.approve(this.cvpBridgeChain1.address, ether(100), {from: bob});
-      await expectRevert(this.cvpBridgeChain1.sendToChain(2, ether(100), alice, 0, {from: bob}), "Limit reached");
+      await expectRevert(this.cvpBridgeChain1.sendToChain(2, ether(100), alice, 0, {from: bob}), 'Limit reached');
       await this.cvpBridgeChain1.setChainLimitPerDay(2, ether(100));
       await this.cvpBridgeChain1.sendToChain(2, ether(100), alice, 0, {from: bob, value: ether(0.1)});
 
       assert.equal(await this.cvp.balanceOf(alice), '0');
 
-      await expectRevert(this.deBridgeGate.callUnlock(this.cvpBridgeChain2.address, 1, ether(100), alice), "Limit reached");
+      await expectRevert(this.deBridgeGate.callUnlock(this.cvpBridgeChain2.address, 1, ether(100), alice), 'Limit reached');
       await this.cvpBridgeChain2.setChainLimitPerDay(1, ether(100));
       await this.deBridgeGate.callUnlock(this.cvpBridgeChain2.address, 1, ether(100), alice);
 
